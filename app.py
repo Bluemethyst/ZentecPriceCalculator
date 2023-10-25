@@ -8,6 +8,11 @@ def calculate_gst():
     gst = None
     costPriceInclGst = None
     costPriceExclGst = None
+    sellPriceExclGst = None
+    sellPriceInclGst = None
+    marginExclGst = None
+    marginInclGst = None
+    marginPercentage = None
     result = 0
     
     if request.method == "POST":
@@ -201,7 +206,7 @@ def calculate_gst():
             if inputValuePlusGst > 1999.99:
                 result = (round(inputValuePlusGst * 1.2, 2))
                 calcInt = 1.2
-        except ValueError:
+        except ValueError or TypeError:
             inputValuePlusGst = 0
             result = 0  
             
@@ -211,13 +216,15 @@ def calculate_gst():
             sellPriceExclGst = round(result / 1.15, 2)
             sellPriceInclGst = round(result, 2)
         else:
-            costPriceExclGst = round(inputValue, 2)
-            costPriceInclGst = round(inputValuePlusGst * 1.15, 2)
-            sellPriceExclGst = round(result / 1.15, 2)
-            sellPriceInclGst = round(result, 2)
-        marginExclGst = round(sellPriceExclGst - costPriceExclGst, 2)
-        marginInclGst = round(sellPriceInclGst - costPriceInclGst, 2)
-        marginPercentage = round(calcInt * 100 - 100, 2)
+            if inputValue is not None:
+                costPriceExclGst = round(inputValue, 2)
+                costPriceInclGst = round(inputValuePlusGst * 1.15, 2)
+                sellPriceExclGst = round(result / 1.15, 2)
+                sellPriceInclGst = round(result, 2)
+        if inputValue is not None:
+            marginExclGst = round(sellPriceExclGst - costPriceExclGst, 2)
+            marginInclGst = round(sellPriceInclGst - costPriceInclGst, 2)
+            marginPercentage = round(calcInt * 100 - 100, 2)
 
     return render_template("index.html", 
                            costPriceExclGst=costPriceExclGst, 
